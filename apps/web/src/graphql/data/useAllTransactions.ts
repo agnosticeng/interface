@@ -1,9 +1,9 @@
+import { useV3TransactionsQuery } from 'graphql/agnostic/transactions/useAllTransactions'
 import {
   Chain,
   PoolTransaction,
   PoolTransactionType,
   useV2TransactionsQuery,
-  useV3TransactionsQuery,
 } from 'graphql/data/__generated__/types-and-hooks'
 import { useCallback, useMemo, useRef } from 'react'
 
@@ -40,7 +40,7 @@ export function useAllTransactions(
     fetchMore: fetchMoreV2,
   } = useV2TransactionsQuery({
     variables: { first: ALL_TX_DEFAULT_QUERY_SIZE },
-    skip: chain !== Chain.Ethereum,
+    skip: true || chain !== Chain.Ethereum,
   })
 
   const loadingMoreV3 = useRef(false)
@@ -61,11 +61,14 @@ export function useAllTransactions(
         updateQuery: (prev, { fetchMoreResult }) => {
           if (!fetchMoreResult) return prev
           if (!loadingMoreV2.current || chain !== Chain.Ethereum) onComplete?.()
-          const mergedData = {
-            v3Transactions: [...(prev.v3Transactions ?? []), ...(fetchMoreResult.v3Transactions ?? [])],
-          }
+          // const mergedData = {
+          //   v3Transactions: [
+          //     ...(prev.v3Transactions ?? []),
+          //     ...(fetchMoreResult.v3Transactions ?? []),
+          //   ],
+          // };
           loadingMoreV3.current = false
-          return mergedData
+          return prev
         },
       })
       chain === Chain.Ethereum &&
