@@ -4,8 +4,11 @@ export const client = new ApolloClient({
   uri: 'https://graphql.eu-west-1.agnostic.engineering/graphql?Authorization=' + process.env.REACT_APP_AGNOSTIC_TOKEN,
   cache: new InMemoryCache({
     typePolicies: {
-      uniswapv3_pools: {
-        keyFields: false,
+      explore_transactions: {
+        keyFields: ['address'],
+      },
+      explore_top_pools: {
+        keyFields: ['address'],
       },
     },
   }),

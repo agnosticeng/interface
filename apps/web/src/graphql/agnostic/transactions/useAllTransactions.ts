@@ -12,7 +12,7 @@ import { client } from '../client'
 
 const ALL_TRANSACTIONS_QUERY = gql`
   {
-    transactions_pools {
+    explore_transactions {
       address
       account
       timestamp
@@ -36,7 +36,7 @@ const ALL_TRANSACTIONS_QUERY = gql`
 `
 
 type AgnosticAllTransactionsResult = {
-  transactions_pools?: {
+  explore_transactions?: {
     address: string
     account: string
     timestamp: string
@@ -59,10 +59,10 @@ type AgnosticAllTransactionsResult = {
 }
 
 function transform(data?: AgnosticAllTransactionsResult): V3TransactionsQuery | undefined {
-  if (!data?.transactions_pools) return undefined
+  if (!data?.explore_transactions) return undefined
 
   return {
-    v3Transactions: data.transactions_pools.map((row) => {
+    v3Transactions: data.explore_transactions.map((row) => {
       return {
         id: window.btoa(`AgnosticTransaction:${row.address}_ETHEREUM`),
         account: row.account,

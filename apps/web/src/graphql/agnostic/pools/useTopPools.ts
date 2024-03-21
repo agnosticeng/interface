@@ -6,7 +6,7 @@ import { client } from '../client'
 
 const TOP_POOLS_QUERY = gql`
   {
-    toppools_explore {
+    explore_top_pools {
       address
       chain_name
       fee_tier
@@ -31,7 +31,7 @@ const TOP_POOLS_QUERY = gql`
 `
 
 type AgnosticTopPoolResult = {
-  toppools_explore?: {
+  explore_top_pools?: {
     address: string
     chain_name: string
     fee_tier: string
@@ -55,10 +55,10 @@ type AgnosticTopPoolResult = {
 }
 
 function transform(data?: AgnosticTopPoolResult): TopV3PoolsQuery | undefined {
-  if (!data?.toppools_explore) return undefined
+  if (!data?.explore_top_pools) return undefined
 
   return {
-    topV3Pools: data?.toppools_explore?.map((raw) => {
+    topV3Pools: data?.explore_top_pools?.map((raw) => {
       return {
         id: window.btoa(`AgnosticPool:${raw.address}_ETHEREUM`),
         address: raw.address,
