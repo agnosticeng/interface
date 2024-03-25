@@ -5,7 +5,7 @@ export const client = new ApolloClient({
   cache: new InMemoryCache({
     typePolicies: {
       explore_transactions: {
-        keyFields: ['address'],
+        keyFields: false,
       },
       explore_top_pools: {
         keyFields: ['address'],

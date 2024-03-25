@@ -64,7 +64,7 @@ function transform(data?: AgnosticAllTransactionsResult): V3TransactionsQuery | 
   return {
     v3Transactions: data.explore_transactions.map((row) => {
       return {
-        id: window.btoa(`AgnosticTransaction:${row.address}_ETHEREUM`),
+        id: window.btoa(`AgnosticTransaction:${row.address}_ETHEREUM_${row.block_number}_${row.transaction_index}`),
         account: row.account,
         chain: Chain.Ethereum,
         hash: `https://txr.agnostic.engineering?block=${row.block_number}&tx=${row.transaction_index}`,
