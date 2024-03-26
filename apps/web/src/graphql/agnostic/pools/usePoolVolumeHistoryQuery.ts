@@ -55,24 +55,14 @@ const intervalDurationMap: Record<HistoryDuration, string> = {
   MAX: '',
 }
 
-function durationToString(d: HistoryDuration): string {
-  switch (d) {
-    case HistoryDuration.Hour:
-      return 'hour'
-    case HistoryDuration.Day:
-      return 'day'
-    case HistoryDuration.Week:
-      return 'week'
-    case HistoryDuration.Month:
-      return 'month'
-    case HistoryDuration.Year:
-      return 'year'
-
-    case HistoryDuration.FiveMinute:
-    case HistoryDuration.Max:
-    default:
-      return ''
-  }
+export const durationMap: Record<HistoryDuration, string> = {
+  FIVE_MINUTE: '',
+  HOUR: 'hour',
+  DAY: 'day',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year',
+  MAX: '',
 }
 
 export function usePoolVolumeHistoryQuery({ variables }: { variables: PDPChartQueryVars }) {
@@ -83,7 +73,7 @@ export function usePoolVolumeHistoryQuery({ variables }: { variables: PDPChartQu
       variables: {
         pool: variables.address,
         interval: intervalDurationMap[variables.duration],
-        duration: durationToString(variables.duration),
+        duration: durationMap[variables.duration],
       },
       skip:
         !variables.isV3 ||

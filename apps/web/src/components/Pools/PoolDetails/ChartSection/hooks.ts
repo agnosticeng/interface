@@ -8,9 +8,9 @@ import {
   checkDataQuality,
   withUTCTimestamp,
 } from 'components/Tokens/TokenDetails/ChartSection/util'
-
+import { usePoolPriceHistoryQuery } from 'graphql/agnostic/pools/usePoolPriceHistoryQuery'
 import { usePoolVolumeHistoryQuery } from 'graphql/agnostic/pools/usePoolVolumeHistoryQuery'
-import { Chain, HistoryDuration, usePoolPriceHistoryQuery } from 'graphql/data/__generated__/types-and-hooks'
+import { Chain, HistoryDuration } from 'graphql/data/__generated__/types-and-hooks'
 import { PoolData } from 'graphql/data/pools/usePoolData'
 import { UTCTimestamp } from 'lightweight-charts'
 import { useMemo } from 'react'
