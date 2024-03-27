@@ -1,7 +1,8 @@
 import { ChainId } from '@uniswap/sdk-core'
-import { useTopV2PairsQuery, useTopV3PoolsQuery } from 'graphql/data/__generated__/types-and-hooks'
+import { useTopV2PairsQuery } from 'graphql/data/__generated__/types-and-hooks'
 import { PoolTableSortState, TablePool, V2_BIPS, calculateTurnover, sortPools } from 'graphql/data/pools/useTopPools'
-import { chainIdToBackendName } from 'graphql/data/util'
+
+import { useTopPoolsFromTokenQuery } from 'graphql/agnostic/pools/usePoolsFromTokenAddress'
 import { useCallback, useMemo, useRef } from 'react'
 
 const DEFAULT_QUERY_SIZE = 20
@@ -12,13 +13,7 @@ export function usePoolsFromTokenAddress(tokenAddress: string, sortState: PoolTa
     error: errorV3,
     data: dataV3,
     fetchMore: fetchMoreV3,
-  } = useTopV3PoolsQuery({
-    variables: {
-      first: DEFAULT_QUERY_SIZE,
-      tokenAddress,
-      chain: chainIdToBackendName(chainId),
-    },
-  })
+  } = useTopPoolsFromTokenQuery(tokenAddress, chainId !== ChainId.MAINNET)
 
   const {
     loading: loadingV2,
@@ -30,7 +25,7 @@ export function usePoolsFromTokenAddress(tokenAddress: string, sortState: PoolTa
       first: DEFAULT_QUERY_SIZE,
       tokenAddress,
     },
-    skip: chainId !== ChainId.MAINNET,
+    skip: true || chainId !== ChainId.MAINNET,
   })
   const loading = loadingV3 || loadingV2
   const error = errorV3 || errorV2
@@ -40,25 +35,15 @@ export function usePoolsFromTokenAddress(tokenAddress: string, sortState: PoolTa
   const sizeRef = useRef(DEFAULT_QUERY_SIZE)
   const loadMore = useCallback(
     ({ onComplete }: { onComplete?: () => void }) => {
+      if (chainId !== ChainId.MAINNET) return
       if (loadingMoreV3.current || (loadingMoreV2.current && chainId === ChainId.MAINNET)) {
         return
       }
       loadingMoreV3.current = true
       loadingMoreV2.current = true
       sizeRef.current += DEFAULT_QUERY_SIZE
-      fetchMoreV3({
-        variables: {
-          cursor: dataV3?.topV3Pools?.[dataV3.topV3Pools.length - 1]?.totalLiquidity?.value,
-        },
-        updateQuery: (prev, { fetchMoreResult }) => {
-          if (!fetchMoreResult || !prev || !Object.keys(prev).length) return prev
-          if (!loadingMoreV2.current || chainId !== ChainId.MAINNET) onComplete?.()
-          const mergedData = {
-            topV3Pools: [...(prev.topV3Pools ?? []).slice(), ...(fetchMoreResult.topV3Pools ?? []).slice()],
-          }
-          loadingMoreV3.current = false
-          return mergedData
-        },
+      fetchMoreV3(() => {
+        loadingMoreV3.current = false
       })
       chainId === ChainId.MAINNET &&
         fetchMoreV2({
@@ -76,7 +61,7 @@ export function usePoolsFromTokenAddress(tokenAddress: string, sortState: PoolTa
           },
         })
     },
-    [chainId, dataV2?.topV2Pairs, dataV3?.topV3Pools, fetchMoreV2, fetchMoreV3]
+    [chainId, dataV2?.topV2Pairs, fetchMoreV2, fetchMoreV3]
   )
 
   return useMemo(() => {
