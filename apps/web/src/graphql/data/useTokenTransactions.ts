@@ -1,11 +1,6 @@
 import { ChainId } from '@uniswap/sdk-core'
-import {
-  Chain,
-  PoolTransactionType,
-  useV2TokenTransactionsQuery,
-  useV3TokenTransactionsQuery,
-} from 'graphql/data/__generated__/types-and-hooks'
-import { chainIdToBackendName } from 'graphql/data/util'
+import { useTokenTransactionQuery } from 'graphql/agnostic/transactions/useTokenTransactions'
+import { Chain, PoolTransactionType, useV2TokenTransactionsQuery } from 'graphql/data/__generated__/types-and-hooks'
 import { useCallback, useMemo, useRef } from 'react'
 
 export enum TokenTransactionType {
@@ -20,18 +15,7 @@ export function useTokenTransactions(
   chainId: ChainId,
   filter: TokenTransactionType[] = [TokenTransactionType.BUY, TokenTransactionType.SELL]
 ) {
-  const {
-    data: dataV3,
-    loading: loadingV3,
-    fetchMore: fetchMoreV3,
-    error: errorV3,
-  } = useV3TokenTransactionsQuery({
-    variables: {
-      address: address.toLowerCase(),
-      chain: chainIdToBackendName(chainId),
-      first: TokenTransactionDefaultQuerySize,
-    },
-  })
+  const { data: dataV3, loading: loadingV3, fetchMore: fetchMoreV3, error: errorV3 } = useTokenTransactionQuery(address)
   const {
     data: dataV2,
     loading: loadingV2,
@@ -42,7 +26,7 @@ export function useTokenTransactions(
       address: address.toLowerCase(),
       first: TokenTransactionDefaultQuerySize,
     },
-    skip: chainId !== ChainId.MAINNET,
+    skip: true || chainId !== ChainId.MAINNET,
   })
   const loadingMoreV3 = useRef(false)
   const loadingMoreV2 = useRef(false)
@@ -64,16 +48,16 @@ export function useTokenTransactions(
             return prev
           }
           if (!loadingMoreV2.current || chainId !== ChainId.MAINNET) onComplete?.()
-          const mergedData = {
-            token: {
-              ...prev.token,
-              id: prev?.token?.id ?? '',
-              chain: prev?.token?.chain ?? Chain.Ethereum,
-              v3Transactions: [...(prev.token?.v3Transactions ?? []), ...(fetchMoreResult.token?.v3Transactions ?? [])],
-            },
-          }
+          // const mergedData = {
+          //   token: {
+          //     ...prev.token,
+          //     id: prev?.token?.id ?? '',
+          //     chain: prev?.token?.chain ?? Chain.Ethereum,
+          //     v3Transactions: [...(prev.token?.v3Transactions ?? []), ...(fetchMoreResult.token?.v3Transactions ?? [])],
+          //   },
+          // }
           loadingMoreV3.current = false
-          return mergedData
+          return prev
         },
       })
       chainId == ChainId.MAINNET &&
