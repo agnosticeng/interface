@@ -113,6 +113,7 @@
     "@types/rebass": "4.0.7",
     "@types/styled-components": "5.1.25",
     "@types/testing-library__cypress": "5.0.13",
+    "@types/ua-parser-js": "0.7.39",
     "@types/uuid": "9.0.1",
     "@types/wcag-contrast": "3.0.0",
     "@types/xml2js": "0.4.14",
