@@ -1,4 +1,5 @@
 import { ChainId } from '@uniswap/sdk-core'
+import { useV3PoolTransactionsQuery } from 'graphql/agnostic/pools/usePoolTransactions'
 import {
   PoolTransactionType,
   ProtocolVersion,
@@ -6,9 +7,7 @@ import {
   V2PairTransactionsQuery,
   V3PoolTransactionsQuery,
   useV2PairTransactionsQuery,
-  useV3PoolTransactionsQuery,
 } from 'graphql/data/__generated__/types-and-hooks'
-import { chainIdToBackendName } from 'graphql/data/util'
 import { useCallback, useMemo, useRef } from 'react'
 
 export enum PoolTableTransactionType {
@@ -59,10 +58,7 @@ export function usePoolTransactions(
     error: errorV3,
     data: dataV3,
     fetchMore: fetchMoreV3,
-  } = useV3PoolTransactionsQuery({
-    variables: { first, chain: chainIdToBackendName(chainId), address },
-    skip: protocolVersion !== ProtocolVersion.V3,
-  })
+  } = useV3PoolTransactionsQuery(address, protocolVersion !== ProtocolVersion.V3)
   const {
     loading: loadingV2,
     error: errorV2,
@@ -75,8 +71,18 @@ export function usePoolTransactions(
   const loadingMore = useRef(false)
   const { transactions, loading, fetchMore, error } =
     protocolVersion === ProtocolVersion.V3
-      ? { transactions: dataV3?.v3Pool?.transactions, loading: loadingV3, fetchMore: fetchMoreV3, error: errorV3 }
-      : { transactions: dataV2?.v2Pair?.transactions, loading: loadingV2, fetchMore: fetchMoreV2, error: errorV2 }
+      ? {
+          transactions: dataV3?.v3Pool?.transactions,
+          loading: loadingV3,
+          fetchMore: fetchMoreV3,
+          error: errorV3,
+        }
+      : {
+          transactions: dataV2?.v2Pair?.transactions,
+          loading: loadingV2,
+          fetchMore: fetchMoreV2,
+          error: errorV2,
+        }
 
   const loadMore = useCallback(
     ({ onComplete }: { onComplete?: () => void }) => {

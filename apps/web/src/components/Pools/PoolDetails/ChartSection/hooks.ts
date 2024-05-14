@@ -8,18 +8,19 @@ import {
   checkDataQuality,
   withUTCTimestamp,
 } from 'components/Tokens/TokenDetails/ChartSection/util'
-
-import {
-  Chain,
-  HistoryDuration,
-  usePoolPriceHistoryQuery,
-  usePoolVolumeHistoryQuery,
-} from 'graphql/data/__generated__/types-and-hooks'
+import { usePoolPriceHistoryQuery } from 'graphql/agnostic/pools/usePoolPriceHistoryQuery'
+import { usePoolVolumeHistoryQuery } from 'graphql/agnostic/pools/usePoolVolumeHistoryQuery'
+import { Chain, HistoryDuration } from 'graphql/data/__generated__/types-and-hooks'
 import { PoolData } from 'graphql/data/pools/usePoolData'
 import { UTCTimestamp } from 'lightweight-charts'
 import { useMemo } from 'react'
 
-type PDPChartQueryVars = { address: string; chain: Chain; duration: HistoryDuration; isV3: boolean }
+export type PDPChartQueryVars = {
+  address: string
+  chain: Chain
+  duration: HistoryDuration
+  isV3: boolean
+}
 export function usePDPPriceChartData(
   variables: PDPChartQueryVars,
   poolData: PoolData | undefined,

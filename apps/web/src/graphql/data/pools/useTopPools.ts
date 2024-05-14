@@ -1,12 +1,8 @@
 import { ChainId, Percent } from '@uniswap/sdk-core'
 import { exploreSearchStringAtom } from 'components/Tokens/state'
 import { BIPS_BASE } from 'constants/misc'
-import {
-  ProtocolVersion,
-  Token,
-  useTopV2PairsQuery,
-  useTopV3PoolsQuery,
-} from 'graphql/data/__generated__/types-and-hooks'
+import { useTopV3PoolsQuery } from 'graphql/agnostic/pools/useTopPools'
+import { ProtocolVersion, Token, useTopV2PairsQuery } from 'graphql/data/__generated__/types-and-hooks'
 import { OrderDirection, chainIdToBackendName } from 'graphql/data/util'
 import { useAtomValue } from 'jotai/utils'
 import { useMemo } from 'react'
@@ -118,7 +114,7 @@ export function useTopPools(sortState: PoolTableSortState, chainId?: ChainId) {
     data: dataV2,
   } = useTopV2PairsQuery({
     variables: { first: 100 },
-    skip: chainId !== ChainId.MAINNET,
+    skip: true || chainId !== ChainId.MAINNET,
   })
   const loading = loadingV3 || loadingV2
   const error = errorV3 || errorV2

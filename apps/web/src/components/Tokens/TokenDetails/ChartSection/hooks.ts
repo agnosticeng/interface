@@ -2,20 +2,20 @@ import { PriceChartData } from 'components/Charts/PriceChart'
 import { StackedLineData } from 'components/Charts/StackedLineChart'
 import { SingleHistogramData } from 'components/Charts/VolumeChart/renderer'
 import { ChartType, PriceChartType } from 'components/Charts/utils'
+import { useTokenHistoricalVolumesQuery } from 'graphql/agnostic/token/useTokenHistoricalVolumes'
 import {
   CandlestickOhlcFragment,
   Chain,
   HistoryDuration,
   PriceHistoryFallbackFragment,
   useTokenHistoricalTvlsQuery,
-  useTokenHistoricalVolumesQuery,
   useTokenPriceQuery,
 } from 'graphql/data/__generated__/types-and-hooks'
 import { UTCTimestamp } from 'lightweight-charts'
 import { useMemo, useReducer } from 'react'
 import { ChartQueryResult, DataQuality, checkDataQuality, withUTCTimestamp } from './util'
 
-type TDPChartQueryVariables = { chain: Chain; address?: string; duration: HistoryDuration }
+export type TDPChartQueryVariables = { chain: Chain; address?: string; duration: HistoryDuration }
 
 function fallbackToPriceChartData(priceHistoryEntry: PriceHistoryFallbackFragment): PriceChartData {
   const { value, timestamp } = priceHistoryEntry

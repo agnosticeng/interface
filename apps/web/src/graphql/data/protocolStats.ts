@@ -3,14 +3,14 @@ import { StackedHistogramData } from 'components/Charts/VolumeChart/renderer'
 import { ChartType } from 'components/Charts/utils'
 import { ChartQueryResult, checkDataQuality } from 'components/Tokens/TokenDetails/ChartSection/util'
 import gql from 'graphql-tag'
+import { useDailyProtocolTvlQuery } from 'graphql/agnostic/useDailyProtocolTVL'
+import { useHistoricalProtocolVolumeQuery } from 'graphql/agnostic/useHistoricalProtocolVolume'
 import {
   Chain,
   HistoryDuration,
   PriceSource,
   ProtocolVersion,
   TimestampedAmount,
-  useDailyProtocolTvlQuery,
-  useHistoricalProtocolVolumeQuery,
 } from 'graphql/data/__generated__/types-and-hooks'
 import { UTCTimestamp } from 'lightweight-charts'
 import { useMemo } from 'react'

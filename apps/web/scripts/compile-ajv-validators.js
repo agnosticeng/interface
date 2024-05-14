@@ -7,6 +7,12 @@ const standaloneCode = require('ajv/dist/standalone').default
 const addFormats = require('ajv-formats')
 const schema = require('@uniswap/token-lists/dist/tokenlist.schema.json')
 
+try {
+  fs.statSync(path.join(__dirname, '../src/utils/__generated__'))
+} catch (e) {
+  fs.mkdirSync(path.join(__dirname, '../src/utils/__generated__'))
+}
+
 const tokenListAjv = new Ajv({ code: { source: true, esm: true } })
 addFormats(tokenListAjv)
 const validateTokenList = tokenListAjv.compile(schema)
