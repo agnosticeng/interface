@@ -97,7 +97,15 @@ function transform(data?: AgnosticTopPoolResult): TopV3PoolsQuery | undefined {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function useTopV3PoolsQuery(_: any) {
-  const { data, error, loading } = useQuery<AgnosticTopPoolResult>(TOP_POOLS_QUERY, { client })
+  const { data, error, loading } = useQuery<AgnosticTopPoolResult>(TOP_POOLS_QUERY, {
+    client,
+    context: {
+      headers: {
+        'Cache-control': 'max-age=1800',
+        'X-Agnostic-Cache-Refresh-Trigger': '0.9',
+      },
+    },
+  })
 
   return {
     data: useMemo(() => transform(data), [data]),
