@@ -1,4 +1,5 @@
 import { ChainId } from '@uniswap/sdk-core'
+import { WETH_ADDRESS } from '@uniswap/universal-router-sdk'
 import { useWeb3React } from '@web3-react/core'
 import PrefetchBalancesWrapper, {
   useCachedPortfolioBalancesQuery,
@@ -9,7 +10,8 @@ import InvalidTokenDetails from 'components/Tokens/TokenDetails/InvalidTokenDeta
 import { TokenDetailsPageSkeleton } from 'components/Tokens/TokenDetails/Skeleton'
 import { checkWarning } from 'constants/tokenSafety'
 import { NATIVE_CHAIN_ID, nativeOnChain } from 'constants/tokens'
-import { useTokenQuery } from 'graphql/data/__generated__/types-and-hooks'
+import { useTokenQuery } from 'graphql/agnostic/assets/token'
+import { Chain } from 'graphql/data/__generated__/types-and-hooks'
 import { gqlToCurrency, supportedChainIdFromGQLChain, validateUrlChainParam } from 'graphql/data/util'
 import { useCurrency } from 'hooks/Tokens'
 import { useSrcColor } from 'hooks/useColor'
@@ -95,7 +97,12 @@ function useCreateTDPContext(): PendingTDPContext | LoadedTDPContext {
 
   const tokenDBAddress = isNative ? getNativeTokenDBAddress(currencyChain) : tokenAddress
 
-  const tokenQuery = useTokenQuery({ variables: { address: tokenDBAddress, chain: currencyChain }, errorPolicy: 'all' })
+  // const tokenQuery = useTokenQuery({ variables: { address: tokenDBAddress, chain: currencyChain }, errorPolicy: 'all' })
+  const tokenQuery = useTokenQuery({
+    variables: { address: tokenDBAddress ?? WETH_ADDRESS(ChainId.MAINNET) },
+    skip: currencyChain !== Chain.Ethereum,
+    errorPolicy: 'all',
+  })
   const chartState = useCreateTDPChartState(tokenDBAddress, currencyChain)
 
   const multiChainMap = useMultiChainMap(tokenQuery)
@@ -118,7 +125,7 @@ function useCreateTDPContext(): PendingTDPContext | LoadedTDPContext {
       // `currency.address` is checksummed, whereas the `tokenAddress` url param may not be
       address: (currency?.isNative ? NATIVE_CHAIN_ID : currency?.address) ?? tokenAddress,
       currencyWasFetchedOnChain,
-      tokenQuery,
+      tokenQuery: tokenQuery as any,
       chartState,
       warning,
       multiChainMap,

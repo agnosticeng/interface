@@ -1,8 +1,8 @@
 import { ApolloClient, InMemoryCache, QueryHookOptions, useQuery } from '@apollo/client'
 import { gql } from 'graphql-tag'
-import { Chain, TokenStandard } from 'graphql/data/__generated__/types-and-hooks'
+import { Chain, Currency, TokenQuery, TokenStandard } from 'graphql/data/__generated__/types-and-hooks'
 import { useMemo } from 'react'
-import { useTokenTVLQuery } from '../token/useTokenTVL'
+import { useTokenMarketQuery } from '../token/useTokenMarket'
 
 const client = new ApolloClient({
   uri: 'https://uniswap-assets.agnostic.dev/graphql',
@@ -60,23 +60,57 @@ export function useTokenQuery(options: QueryHookOptions<Query, Variables>) {
     ...options,
     client,
   })
-  const { data: tvl } = useTokenTVLQuery({ variables: { token: options.variables?.address } })
+  const { data: market } = useTokenMarketQuery(options.variables?.address, options.skip)
+
   return {
     ...rest,
-    data: useMemo(() => {
-      return {
-        token: {
-          ...data?.token,
-          market: {
-            id: window.btoa(`TokenMarket:ETHEREUM_${data?.token?.address}_USD`),
-            totalValueLocked: {
-              id: window.btoa(`Amount:${tvl?.explore_token_tvl.total_value_locked.usd}_USD`),
-              value: tvl?.explore_token_tvl.total_value_locked.usd,
-              currency: 'USD',
-            },
-          },
+    data: useMemo(() => transform(data?.token, market), [data?.token, market]),
+  }
+}
+
+function transform(
+  token?: Query['token'],
+  market?: ReturnType<typeof useTokenMarketQuery>['data']
+): TokenQuery | undefined {
+  if (!token || !market) return undefined
+
+  return {
+    token: {
+      id: token.id,
+      chain: token.chain,
+      address: token.address,
+      decimals: token.decimals,
+      name: token.name,
+      standard: token.standard,
+      symbol: token.symbol,
+      market: {
+        id: market.id,
+        price: {
+          id: window.btoa(`Amount:${market.price}_USD`),
+          value: market.price,
+          currency: Currency.Usd,
         },
-      }
-    }, [data?.token, tvl?.explore_token_tvl.total_value_locked.usd]),
+        priceHigh52W: {
+          id: window.btoa(`Amount:${market.priceHigh52W}_USD`),
+          value: market.priceHigh52W,
+        },
+        priceLow52W: {
+          id: window.btoa(`Amount:${market.priceLow52W}_USD`),
+          value: market.priceLow52W,
+        },
+        totalValueLocked: {
+          id: window.btoa(`Amount:${market.totalValueLocked}_USD`),
+          value: market.totalValueLocked,
+        },
+        volume24H: {
+          id: window.btoa(`Amount:${market.volume24H}_USD`),
+          value: market.volume24H,
+        },
+      },
+      project: {
+        ...token.project,
+        tokens: [token],
+      },
+    },
   }
 }

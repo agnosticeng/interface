@@ -63,7 +63,6 @@ type Input = {
 }
 
 export function useTokenPriceQuery(options: Input) {
-  console.log(!options.variables.address)
   const { data, loading } = useQuery<TokenPriceQuery, TokenPriceVariables>(TOKEN_PRICE_QUERY, {
     client,
     variables: {
