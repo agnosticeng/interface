@@ -102,7 +102,7 @@ export function useTopV3PoolsQuery(_: any) {
     context: {
       headers: {
         'Cache-control': 'max-age=1800',
-        'X-Agnostic-Cache-Refresh-Trigger': '0.9',
+        'X-Agnostic-Cache-Refresh-Trigger': '0.8',
       },
     },
   })
