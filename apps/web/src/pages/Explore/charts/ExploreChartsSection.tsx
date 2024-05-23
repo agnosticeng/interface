@@ -30,7 +30,10 @@ import { EllipsisStyle, ThemedText } from 'theme/components'
 import { NumberType, useFormatter } from 'utils/formatNumbers'
 
 const EXPLORE_CHART_HEIGHT_PX = 368
-const EXPLORE_PRICE_SOURCES = [PriceSource.SubgraphV2, PriceSource.SubgraphV3]
+const EXPLORE_PRICE_SOURCES = [
+  // PriceSource.SubgraphV2,
+  PriceSource.SubgraphV3,
+]
 
 const TIME_SELECTOR_OPTIONS = [
   { time: TimePeriod.DAY, display: 'D' },

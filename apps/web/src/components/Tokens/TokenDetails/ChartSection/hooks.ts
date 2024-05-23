@@ -3,13 +3,13 @@ import { StackedLineData } from 'components/Charts/StackedLineChart'
 import { SingleHistogramData } from 'components/Charts/VolumeChart/renderer'
 import { ChartType, PriceChartType } from 'components/Charts/utils'
 import { useTokenHistoricalVolumesQuery } from 'graphql/agnostic/token/useTokenHistoricalVolumes'
+import { useTokenPriceQuery } from 'graphql/agnostic/token/useTokenPrice'
 import {
   CandlestickOhlcFragment,
   Chain,
   HistoryDuration,
   PriceHistoryFallbackFragment,
   useTokenHistoricalTvlsQuery,
-  useTokenPriceQuery,
 } from 'graphql/data/__generated__/types-and-hooks'
 import { UTCTimestamp } from 'lightweight-charts'
 import { useMemo, useReducer } from 'react'

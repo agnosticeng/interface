@@ -29,7 +29,6 @@ type AgnosticHistoricalProtocolVolumeVariables = {
   all_time?: boolean
 }
 
-// eslint-disable-next-line import/no-unused-modules
 export function useHistoricalProtocolVolumeQuery({
   variables,
 }: {
@@ -45,6 +44,12 @@ export function useHistoricalProtocolVolumeQuery({
         all_time: variables.duration === HistoryDuration.Max,
       },
       skip: shouldSkip(variables.chain, variables.duration),
+      context: {
+        headers: {
+          'Cache-control': 'max-age=86400',
+          'X-Agnostic-Cache-Refresh-Trigger': '0.9',
+        },
+      },
     }
   )
 

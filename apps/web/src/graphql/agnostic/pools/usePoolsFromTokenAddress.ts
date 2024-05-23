@@ -54,6 +54,12 @@ export function useTopPoolsFromTokenQuery(token: string, skip = false) {
       offset: '0',
     },
     skip,
+    context: {
+      headers: {
+        'Cache-control': 'max-age=1800',
+        'X-Agnostic-Cache-Refresh-Trigger': '0.9',
+      },
+    },
   })
 
   const offsetRef = useRef(20)

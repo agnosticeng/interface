@@ -98,7 +98,10 @@ export function useDailyProtocolTVL(chain: Chain): ChartQueryResult<StackedLineD
     const dataByTime = mapDataByTimestamp(queryData?.v2DailyProtocolTvl, queryData?.v3DailyProtocolTvl)
     const entries = Object.entries(dataByTime).map(([timestamp, values]) => ({
       time: Number(timestamp),
-      values: [values[ProtocolVersion.V2], values[ProtocolVersion.V3]],
+      values: [
+        // values[ProtocolVersion.V2],
+        values[ProtocolVersion.V3],
+      ],
     })) as StackedLineData[]
 
     const dataQuality = checkDataQuality(entries, ChartType.TVL, HistoryDuration.Year)

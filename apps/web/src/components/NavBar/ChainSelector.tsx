@@ -121,7 +121,7 @@ export const ChainSelector = ({ leftAlign }: { leftAlign?: boolean }) => {
       <Column paddingX="8" data-testid="chain-selector-options">
         {supportedChains.map((selectorChain) => (
           <ChainSelectorRow
-            disabled={!walletSupportsChain.includes(selectorChain)}
+            disabled={selectorChain !== ChainId.MAINNET || !walletSupportsChain.includes(selectorChain)}
             onSelectChain={onSelectChain}
             targetChain={selectorChain}
             key={selectorChain}

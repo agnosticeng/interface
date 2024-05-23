@@ -17,11 +17,16 @@ type AgnosticHistoricalProtocolTVLResult = {
   explore_daily_protocol_tvl_v3?: { timestamp: string; tvl_usd: string }[]
 }
 
-// eslint-disable-next-line import/no-unused-modules
 export function useDailyProtocolTvlQuery({ variables }: { variables: { chain: Chain } }) {
   const { data, loading } = useQuery<AgnosticHistoricalProtocolTVLResult>(HISTORICAL_PROTOCOL_TVL_QUERY, {
     client,
     skip: variables.chain !== Chain.Ethereum,
+    context: {
+      headers: {
+        'Cache-control': 'max-age=86400',
+        'X-Agnostic-Cache-Refresh-Trigger': '0.9',
+      },
+    },
   })
 
   return {

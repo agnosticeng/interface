@@ -2,13 +2,11 @@ import { ChainId, Currency, Price, Token, V3_CORE_FACTORY_ADDRESSES } from '@uni
 import { FeeAmount, Pool, TICK_SPACINGS, tickToPrice } from '@uniswap/v3-sdk'
 import { useWeb3React } from '@web3-react/core'
 import { TickData, Ticks } from 'graphql/thegraph/AllV3TicksQuery'
-import { useAllV3TicksQuery } from 'graphql/thegraph/__generated__/types-and-hooks'
 import JSBI from 'jsbi'
-import ms from 'ms'
 import { useEffect, useMemo, useState } from 'react'
 import computeSurroundingTicks from 'utils/computeSurroundingTicks'
 
-import { chainToApolloClient } from 'graphql/thegraph/apollo'
+import { usePoolTicksQuery } from 'graphql/agnostic/pools/usePoolTicks'
 import { PoolState, usePoolMultichain } from './usePools'
 
 const PRICE_FIXED_DIGITS = 8
@@ -32,7 +30,6 @@ function useTicksFromSubgraph(
   skip = 0,
   chainId: ChainId
 ) {
-  const apolloClient = chainToApolloClient[chainId]
   const poolAddress =
     currencyA && currencyB && feeAmount
       ? Pool.getAddress(
@@ -44,12 +41,9 @@ function useTicksFromSubgraph(
         )
       : undefined
 
-  return useAllV3TicksQuery({
-    variables: { poolAddress: poolAddress?.toLowerCase(), skip },
-    skip: !poolAddress,
-    pollInterval: ms(`30s`),
-    client: apolloClient,
-  })
+  const agnostic = usePoolTicksQuery(poolAddress, Boolean(skip) || chainId !== ChainId.MAINNET)
+
+  return agnostic
 }
 
 const MAX_THE_GRAPH_TICK_FETCH_VALUE = 1000
@@ -70,7 +64,7 @@ function useAllV3Ticks(
 
   useEffect(() => {
     if (data?.ticks.length) {
-      setSubgraphTickData((tickData) => [...tickData, ...data.ticks])
+      setSubgraphTickData((tickData) => uniqBy([...tickData, ...data.ticks], 'tick'))
       if (data.ticks.length === MAX_THE_GRAPH_TICK_FETCH_VALUE) {
         setSkipNumber((skipNumber) => skipNumber + MAX_THE_GRAPH_TICK_FETCH_VALUE)
       }
@@ -171,4 +165,8 @@ export function usePoolActiveLiquidity(
       data: ticksProcessed,
     }
   }, [currencyA, currencyB, activeTick, pool, ticks, isLoading, error, currentTick, liquidity, sqrtPriceX96])
+}
+
+function uniqBy<T extends object, K extends keyof T>(arr: T[], key: K) {
+  return Array.from(arr.reduce((m, item) => m.set(item[key], item), new Map<T[K], T>()).values())
 }
